@@ -1,6 +1,7 @@
+import React from 'react';
 import BookingForm from './components/BookingForm';
 
-function App() {
+function DCAApp() {
   return (
     <div>
       <BookingForm />
@@ -8,4 +9,4 @@ function App() {
   );
 }
 
-export default App;
+export default DCAApp;
