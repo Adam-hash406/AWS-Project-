@@ -21,11 +21,18 @@ export default function BookingForm() {
         body: JSON.stringify(formData)
       });
 
-      const result = await response.json();
+      const text = await response.text();
+      let result;
+      try {
+        result = JSON.parse(text);
+      } catch {
+        result = { message: text };
+      }
+
       if (response.ok) {
-        alert("Booking submitted successfully!");
+        alert(result.message || "Booking submitted successfully!");
       } else {
-        alert("Error: " + result.error);
+        alert("Error: " + (result.error || "Unknown error"));
       }
     } catch (err) {
       console.error("Error submitting booking:", err);
@@ -55,3 +62,4 @@ export default function BookingForm() {
     </div>
   );
 }
+
