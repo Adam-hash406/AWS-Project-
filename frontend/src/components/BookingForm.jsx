@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { API } from 'aws-amplify';
-import '../../styles/form.css';
+import './styles/form.css';
 
 export default function BookingForm() {
   const [formData, setFormData] = useState({
