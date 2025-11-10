@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { API } from 'aws-amplify';
 import './styles/form.css';
 
 export default function BookingForm() {
@@ -14,10 +13,23 @@ export default function BookingForm() {
 
   const handleSubmit = async () => {
     try {
-      await API.post('BookingAPI', '/submitBooking', { body: formData });
-      alert('Booking submitted successfully!');
+      const response = await fetch("https://qpt7e2jrjj.execute-api.us-east-1.amazonaws.com/dev/book", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(formData)
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        alert("Booking submitted successfully!");
+      } else {
+        alert("Error: " + result.error);
+      }
     } catch (err) {
-      console.error('Error submitting booking:', err);
+      console.error("Error submitting booking:", err);
+      alert("Submission failed. Check console for details.");
     }
   };
 
