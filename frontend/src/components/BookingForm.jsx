@@ -47,9 +47,7 @@ export default function BookingForm() {
     try {
       const response = await fetch("https://qpt7e2jrjj.execute-api.us-east-1.amazonaws.com/dev/book", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)
       });
 
@@ -63,9 +61,14 @@ export default function BookingForm() {
 
       if (response.ok) {
         alert(result.message || "Booking submitted successfully!");
-        setShowMaps(true); // show maps after successful submit
       } else {
         alert("Error: " + (result.error || "Unknown error"));
+      }
+
+      // ✅ Always show maps after submit if a base is selected
+      if (formData.base && areaInfo) {
+        setShowMaps(true);
+        console.log("Showing maps for:", areaInfo);
       }
     } catch (err) {
       console.error("Error submitting booking:", err);
@@ -103,18 +106,17 @@ export default function BookingForm() {
         <button type="button" onClick={handleSubmit}>Submit Booking</button>
       </form>
 
-      {/* Area info + maps appear below dropdown after submit */}
+      {/* ✅ Area info + maps appear below dropdown after submit */}
       {areaInfo && showMaps && (
         <div className="area-info">
           <h3>Area Information</h3>
           <p><strong>Postcode:</strong> {areaInfo.postcode}</p>
-          <p><strong>Region:</strong> {areaInfo.region}</p>
-          <p><strong>District:</strong> {areaInfo.district}</p>
-          <p><strong>Country:</strong> {areaInfo.country}</p>
+          <p><strong>Region:</strong> {areaInfo.area_info?.region || areaInfo.region}</p>
+          <p><strong>District:</strong> {areaInfo.area_info?.district || areaInfo.district}</p>
+          <p><strong>Country:</strong> {areaInfo.area_info?.country || areaInfo.country}</p>
 
           <div className="map-container">
             <h3>Surrounding Area (5 miles)</h3>
-            {/* Render up to 5 maps if Lambda returns multiple map URLs */}
             {areaInfo.map_urls
               ? areaInfo.map_urls.map((url, idx) => (
                   <img
