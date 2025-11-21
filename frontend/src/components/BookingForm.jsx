@@ -4,11 +4,41 @@ import './styles/form.css';
 export default function BookingForm() {
   const [formData, setFormData] = useState({
     rank: '', surname: '', forename: '', serviceNumber: '',
-    email: '', courseTitle: '', startDate: '', endDate: '', cicNumber: ''
+    email: '', courseTitle: '', startDate: '', endDate: '', cicNumber: '', base: ''
   });
+
+  const [areaInfo, setAreaInfo] = useState(null);
+
+  const bases = [
+    "RAF Brize Norton",
+    "RAF Lossiemouth",
+    "Catterick Garrison",
+    "HMNB Portsmouth",
+    "RAF Marham"
+  ];
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleBaseChange = async (e) => {
+    const baseName = e.target.value;
+    setFormData({ ...formData, base: baseName });
+
+    if (baseName) {
+      try {
+        const res = await fetch(
+          `https://qpt7e2jrjj.execute-api.us-east-1.amazonaws.com/Prod/base-info?base=${encodeURIComponent(baseName)}`
+        );
+        const data = await res.json();
+        setAreaInfo(data);
+      } catch (err) {
+        console.error("Error fetching base info:", err);
+        setAreaInfo(null);
+      }
+    } else {
+      setAreaInfo(null);
+    }
   };
 
   const handleSubmit = async () => {
@@ -57,9 +87,26 @@ export default function BookingForm() {
         <input name="endDate" type="date" onChange={handleChange} />
         <input name="cicNumber" placeholder="CIC Number" onChange={handleChange} />
 
+        <h2>Base Selection</h2>
+        <select name="base" value={formData.base} onChange={handleBaseChange}>
+          <option value="">-- Choose a base --</option>
+          {bases.map((b) => (
+            <option key={b} value={b}>{b}</option>
+          ))}
+        </select>
+
+        {areaInfo && (
+          <div className="area-info">
+            <h3>Area Information</h3>
+            <p><strong>Postcode:</strong> {areaInfo.postcode}</p>
+            <p><strong>Region:</strong> {areaInfo.area_info?.region}</p>
+            <p><strong>District:</strong> {areaInfo.area_info?.admin_district}</p>
+            <p><strong>Country:</strong> {areaInfo.area_info?.country}</p>
+          </div>
+        )}
+
         <button type="button" onClick={handleSubmit}>Submit Booking</button>
       </form>
     </div>
   );
 }
-
