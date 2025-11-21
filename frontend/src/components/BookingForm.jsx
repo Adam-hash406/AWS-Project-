@@ -22,36 +22,36 @@ export default function BookingForm() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleBaseChange = async (e) => {
-    const baseName = e.target.value;
-    setFormData({ ...formData, base: baseName });
+const handleBaseChange = async (e) => {
+  const baseName = e.target.value;
+  setFormData({ ...formData, base: baseName });
 
-    if (baseName) {
-      try {
-        const res = await fetch(
-          `https://qpt7e2jrjj.execute-api.us-east-1.amazonaws.com/dev/base-info?base=${encodeURIComponent(baseName)}`
-        );
-        const raw = await res.json();
+  if (baseName) {
+    try {
+      const res = await fetch(
+        `https://qpt7e2jrjj.execute-api.us-east-1.amazonaws.com/dev/base-info?base=${encodeURIComponent(baseName)}`
+      );
+      const raw = await res.json();
 
-        // ✅ Parse body if it's a string
-        const parsed = typeof raw.body === "string" ? JSON.parse(raw.body) : raw.body;
+      // ✅ Parse the inner body if present
+      const parsed = raw.body ? JSON.parse(raw.body) : raw;
 
-        if (raw.statusCode === 200 || res.ok) {
-          setAreaInfo(parsed);
-          setShowMaps(false); // reset maps until submit
-          console.log("Base info parsed:", parsed);
-        } else {
-          console.error("Base info error:", parsed?.error || "Unknown error");
-          setAreaInfo(null);
-        }
-      } catch (err) {
-        console.error("Error fetching base info:", err);
+      if ((raw.statusCode && raw.statusCode === 200) || res.ok) {
+        setAreaInfo(parsed);
+        setShowMaps(false); // reset maps until submit
+        console.log("Base info parsed:", parsed);
+      } else {
+        console.error("Base info error:", parsed?.error || "Unknown error");
         setAreaInfo(null);
       }
-    } else {
+    } catch (err) {
+      console.error("Error fetching base info:", err);
       setAreaInfo(null);
     }
-  };
+  } else {
+    setAreaInfo(null);
+  }
+};
 
   const handleSubmit = async () => {
     try {
