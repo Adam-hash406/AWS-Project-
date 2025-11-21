@@ -22,51 +22,41 @@ export default function BookingForm() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-const handleBaseChange = async (e) => {
-  const baseName = e.target.value;
-  setFormData({ ...formData, base: baseName });
-const handleBaseChange = async (e) => {
-  const baseName = e.target.value;
-  setFormData({ ...formData, base: baseName });
+  const handleBaseChange = async (e) => {
+    const baseName = e.target.value;
+    setFormData({ ...formData, base: baseName });
 
-  if (baseName) {
-    try {
-      const res = await fetch(
-        `https://qpt7e2jrjj.execute-api.us-east-1.amazonaws.com/dev/base-info?base=${encodeURIComponent(baseName)}`
-      );
-      const raw = await res.json();
+    if (baseName) {
+      try {
+        const res = await fetch(
+          `https://qpt7e2jrjj.execute-api.us-east-1.amazonaws.com/dev/base-info?base=${encodeURIComponent(baseName)}`
+        );
+        const raw = await res.json();
 
-      let parsed;
-      if (raw.body) {
-        // Case 1: API Gateway wrapper
-        try {
+        // ✅ Handle both wrapped and direct responses
+        let parsed;
+        if (raw.body && typeof raw.body === "string") {
           parsed = JSON.parse(raw.body);
-        } catch (err) {
-          console.error("Failed to parse body string:", err);
-          parsed = raw.body;
+        } else {
+          parsed = raw;
         }
-      } else {
-        // Case 2: Already parsed object
-        parsed = raw;
-      }
 
-      if ((raw.statusCode && raw.statusCode === 200) || res.ok) {
-        setAreaInfo(parsed);
-        setShowMaps(false); // reset maps until submit
-        console.log("Base info parsed:", parsed);
-      } else {
-        console.error("Base info error:", parsed?.error || "Unknown error");
+        if ((raw.statusCode && raw.statusCode === 200) || res.ok) {
+          setAreaInfo(parsed);
+          setShowMaps(false); // reset maps until submit
+          console.log("Base info parsed:", parsed);
+        } else {
+          console.error("Base info error:", parsed?.error || "Unknown error");
+          setAreaInfo(null);
+        }
+      } catch (err) {
+        console.error("Error fetching base info:", err);
         setAreaInfo(null);
       }
-    } catch (err) {
-      console.error("Error fetching base info:", err);
+    } else {
       setAreaInfo(null);
     }
-  } else {
-    setAreaInfo(null);
-  }
-};
- 
+  };
 
   const handleSubmit = async () => {
     try {
@@ -105,7 +95,6 @@ const handleBaseChange = async (e) => {
     <div className="form-container">
       <h1>DCA Accommodation Booking Form</h1>
 
-      {/* Base selection moved just below title */}
       <h2>Base Selection</h2>
       <select name="base" value={formData.base} onChange={handleBaseChange}>
         <option value="">-- Choose a base --</option>
@@ -131,7 +120,6 @@ const handleBaseChange = async (e) => {
         <button type="button" onClick={handleSubmit}>Submit Booking</button>
       </form>
 
-      {/* ✅ Area info + maps appear below dropdown after submit */}
       {areaInfo && showMaps && (
         <div className="area-info">
           <h3>Area Information</h3>
@@ -164,3 +152,4 @@ const handleBaseChange = async (e) => {
     </div>
   );
 }
+
