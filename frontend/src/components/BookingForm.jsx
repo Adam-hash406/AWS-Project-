@@ -29,7 +29,7 @@ export default function BookingForm() {
     if (baseName) {
       try {
         const res = await fetch(
-          `https://qpt7e2jrjj.execute-api.us-east-1.amazonaws.com/Prod/base-info?base=${encodeURIComponent(baseName)}`
+          `https://qpt7e2jrjj.execute-api.us-east-1.amazonaws.com/dev/base-info?base=${encodeURIComponent(baseName)}`
         );
         const data = await res.json();
         setAreaInfo(data);
