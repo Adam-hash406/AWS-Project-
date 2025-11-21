@@ -33,25 +33,15 @@ const handleBaseChange = async (e) => {
       );
       const raw = await res.json();
 
-      let parsed;
-      try {
-        if (raw && typeof raw === "object" && "body" in raw && typeof raw.body === "string") {
-          // Case 1: API Gateway wrapper
-          parsed = JSON.parse(raw.body);
-        } else {
-          // Case 2: Already parsed JSON
-          parsed = raw;
-        }
-      } catch (err) {
-        console.error("Failed to parse response:", err, raw);
-        parsed = null;
-      }
+      // ✅ Always parse the body string
+      const parsed = JSON.parse(raw.body);
 
-      if (parsed) {
+      if (raw.statusCode === 200) {
         setAreaInfo(parsed);
         setShowMaps(false); // reset maps until submit
         console.log("Base info parsed:", parsed);
       } else {
+        console.error("Base info error:", parsed?.error || "Unknown error");
         setAreaInfo(null);
       }
     } catch (err) {
