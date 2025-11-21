@@ -33,10 +33,19 @@ export default function BookingForm() {
         );
         const raw = await res.json();
 
-        // ✅ Always parse the body string from API Gateway wrapper
-        const parsed = raw.body ? JSON.parse(raw.body) : raw;
+        // ✅ Safe parsing: handle both string and object body
+        let parsed;
+        if (raw.body) {
+          if (typeof raw.body === "string") {
+            parsed = JSON.parse(raw.body);
+          } else {
+            parsed = raw.body;
+          }
+        } else {
+          parsed = raw;
+        }
 
-        if (raw.statusCode === 200) {
+        if ((raw.statusCode && raw.statusCode === 200) || res.ok) {
           setAreaInfo(parsed);
           setShowMaps(false); // reset maps until submit
           console.log("Base info parsed:", parsed);
@@ -75,7 +84,6 @@ export default function BookingForm() {
         alert("Error: " + (result.error || "Unknown error"));
       }
 
-      // ✅ Always show maps after submit if a base is selected
       if (formData.base && areaInfo) {
         setShowMaps(true);
         console.log("Showing maps for:", areaInfo);
@@ -119,32 +127,23 @@ export default function BookingForm() {
         <div className="area-info">
           <h3>Area Information</h3>
           <p><strong>Postcode:</strong> {areaInfo.postcode}</p>
-          <p><strong>Region:</strong> {areaInfo.area_info?.region || areaInfo.region}</p>
-          <p><strong>District:</strong> {areaInfo.area_info?.district || areaInfo.district}</p>
-          <p><strong>Country:</strong> {areaInfo.area_info?.country || areaInfo.country}</p>
+          <p><strong>Region:</strong> {areaInfo.area_info?.region}</p>
+          <p><strong>District:</strong> {areaInfo.area_info?.district}</p>
+          <p><strong>Country:</strong> {areaInfo.area_info?.country}</p>
 
           <div className="map-container">
             <h3>Surrounding Area (5 miles)</h3>
-            {areaInfo.map_urls
-              ? areaInfo.map_urls.map((url, idx) => (
-                  <img
-                    key={idx}
-                    src={url}
-                    alt={`Map ${idx + 1}`}
-                    style={{ width: "100%", height: "300px", marginBottom: "10px", border: "1px solid #ccc" }}
-                  />
-                ))
-              : areaInfo.map_url && (
-                  <img
-                    src={areaInfo.map_url}
-                    alt="Map of surrounding area"
-                    style={{ width: "100%", height: "400px", border: "1px solid #ccc" }}
-                  />
-                )}
+            {Array.isArray(areaInfo.map_urls) && areaInfo.map_urls.map((url, idx) => (
+              <img
+                key={idx}
+                src={url}
+                alt={`Map ${idx + 1}`}
+                style={{ width: "100%", height: "300px", marginBottom: "10px", border: "1px solid #ccc" }}
+              />
+            ))}
           </div>
         </div>
       )}
     </div>
   );
 }
-
