@@ -74,21 +74,8 @@ export default function BookingForm() {
 
   return (
     <div className="form-container">
-      <h1>DCA Accommodation Booking Form</h1>
+      <h1>Accommodation Booking Form</h1>
       <form>
-        <h2>Personal Details</h2>
-        <input name="rank" placeholder="Rank" onChange={handleChange} />
-        <input name="surname" placeholder="Surname" onChange={handleChange} />
-        <input name="forename" placeholder="Forename" onChange={handleChange} />
-        <input name="serviceNumber" placeholder="Service Number" onChange={handleChange} />
-        <input name="email" placeholder="Contact Email" onChange={handleChange} />
-
-        <h2>Course Details</h2>
-        <input name="courseTitle" placeholder="Course Title" onChange={handleChange} />
-        <input name="startDate" type="date" onChange={handleChange} />
-        <input name="endDate" type="date" onChange={handleChange} />
-        <input name="cicNumber" placeholder="CIC Number" onChange={handleChange} />
-
         <h2>Base Selection</h2>
         <select name="base" value={formData.base} onChange={handleBaseChange}>
           <option value="">-- Choose a base --</option>
@@ -105,6 +92,21 @@ export default function BookingForm() {
             <p><strong>District:</strong> {areaInfo.area_info?.admin_district}</p>
             <p><strong>Country:</strong> {areaInfo.area_info?.country}</p>
           </div>
+        )}
+        <h2>Personal Details</h2>
+        <input name="rank" placeholder="Rank" onChange={handleChange} />
+        <input name="surname" placeholder="Surname" onChange={handleChange} />
+        <input name="forename" placeholder="Forename" onChange={handleChange} />
+        <input name="serviceNumber" placeholder="Service Number" onChange={handleChange} />
+        <input name="email" placeholder="Contact Email" onChange={handleChange} />
+
+        <h2>Course Details</h2>
+        <input name="courseTitle" placeholder="Course Title" onChange={handleChange} />
+        <input name="startDate" type="date" onChange={handleChange} />
+        <input name="endDate" type="date" onChange={handleChange} />
+        <input name="cicNumber" placeholder="CIC Number" onChange={handleChange} />
+
+        <
         )}
 
         <button type="button" onClick={handleSubmit}>Submit Booking</button>
