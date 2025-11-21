@@ -31,9 +31,19 @@ export default function BookingForm() {
         const res = await fetch(
           `https://qpt7e2jrjj.execute-api.us-east-1.amazonaws.com/dev/base-info?base=${encodeURIComponent(baseName)}`
         );
-        const data = await res.json();
-        setAreaInfo(data);
-        setShowMaps(false); // reset maps until submit
+        const raw = await res.json();
+
+        // ✅ Parse body if it's a string
+        const parsed = typeof raw.body === "string" ? JSON.parse(raw.body) : raw.body;
+
+        if (raw.statusCode === 200 || res.ok) {
+          setAreaInfo(parsed);
+          setShowMaps(false); // reset maps until submit
+          console.log("Base info parsed:", parsed);
+        } else {
+          console.error("Base info error:", parsed?.error || "Unknown error");
+          setAreaInfo(null);
+        }
       } catch (err) {
         console.error("Error fetching base info:", err);
         setAreaInfo(null);
