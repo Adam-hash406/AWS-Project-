@@ -25,6 +25,9 @@ export default function BookingForm() {
 const handleBaseChange = async (e) => {
   const baseName = e.target.value;
   setFormData({ ...formData, base: baseName });
+const handleBaseChange = async (e) => {
+  const baseName = e.target.value;
+  setFormData({ ...formData, base: baseName });
 
   if (baseName) {
     try {
@@ -33,8 +36,19 @@ const handleBaseChange = async (e) => {
       );
       const raw = await res.json();
 
-      // ✅ Parse the inner body if present
-      const parsed = raw.body ? JSON.parse(raw.body) : raw;
+      let parsed;
+      if (raw.body) {
+        // Case 1: API Gateway wrapper
+        try {
+          parsed = JSON.parse(raw.body);
+        } catch (err) {
+          console.error("Failed to parse body string:", err);
+          parsed = raw.body;
+        }
+      } else {
+        // Case 2: Already parsed object
+        parsed = raw;
+      }
 
       if ((raw.statusCode && raw.statusCode === 200) || res.ok) {
         setAreaInfo(parsed);
@@ -52,6 +66,7 @@ const handleBaseChange = async (e) => {
     setAreaInfo(null);
   }
 };
+ 
 
   const handleSubmit = async () => {
     try {
