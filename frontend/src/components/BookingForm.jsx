@@ -22,41 +22,47 @@ export default function BookingForm() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleBaseChange = async (e) => {
-    const baseName = e.target.value;
-    setFormData({ ...formData, base: baseName });
+const handleBaseChange = async (e) => {
+  const baseName = e.target.value;
+  setFormData({ ...formData, base: baseName });
 
-    if (baseName) {
+  if (baseName) {
+    try {
+      const res = await fetch(
+        `https://qpt7e2jrjj.execute-api.us-east-1.amazonaws.com/dev/base-info?base=${encodeURIComponent(baseName)}`
+      );
+      const raw = await res.json();
+
+      let parsed;
       try {
-        const res = await fetch(
-          `https://qpt7e2jrjj.execute-api.us-east-1.amazonaws.com/dev/base-info?base=${encodeURIComponent(baseName)}`
-        );
-        const raw = await res.json();
-
-        // ✅ Handle both wrapped and direct responses
-        let parsed;
-        if (raw.body && typeof raw.body === "string") {
+        if (raw && typeof raw === "object" && "body" in raw && typeof raw.body === "string") {
+          // Case 1: API Gateway wrapper
           parsed = JSON.parse(raw.body);
         } else {
+          // Case 2: Already parsed JSON
           parsed = raw;
         }
-
-        if ((raw.statusCode && raw.statusCode === 200) || res.ok) {
-          setAreaInfo(parsed);
-          setShowMaps(false); // reset maps until submit
-          console.log("Base info parsed:", parsed);
-        } else {
-          console.error("Base info error:", parsed?.error || "Unknown error");
-          setAreaInfo(null);
-        }
       } catch (err) {
-        console.error("Error fetching base info:", err);
+        console.error("Failed to parse response:", err, raw);
+        parsed = null;
+      }
+
+      if (parsed) {
+        setAreaInfo(parsed);
+        setShowMaps(false); // reset maps until submit
+        console.log("Base info parsed:", parsed);
+      } else {
         setAreaInfo(null);
       }
-    } else {
+    } catch (err) {
+      console.error("Error fetching base info:", err);
       setAreaInfo(null);
     }
-  };
+  } else {
+    setAreaInfo(null);
+  }
+};
+
 
   const handleSubmit = async () => {
     try {
