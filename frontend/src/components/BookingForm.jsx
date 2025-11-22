@@ -118,7 +118,7 @@ export default function BookingForm() {
         <input name="cicNumber" placeholder="CIC Number" value={formData.cicNumber} onChange={handleChange} />
 
         <button type="button" onClick={handleSubmit}>Submit Booking</button>
-        <button type="button" onClick={handleReset} style={{ marginLeft: "10px" }}>Reset Form</button>
+        <button type="button" onClick={handleReset}>Reset Form</button>
       </form>
 
       {showAreaBox && (
