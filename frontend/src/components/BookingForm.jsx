@@ -84,7 +84,7 @@ export default function BookingForm() {
 
   return (
     <div className="form-container">
-      <h1>DCA Accommodation Booking Form</h1>
+      <h1>Accommodation Booking Form</h1>
 
       <h2>Base Selection</h2>
       <select name="base" value={formData.base} onChange={handleBaseChange}>
