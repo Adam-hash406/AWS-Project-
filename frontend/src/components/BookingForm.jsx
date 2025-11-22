@@ -34,12 +34,12 @@ export default function BookingForm() {
         const raw = await res.json();
         const parsed = JSON.parse(raw.body); // proxy integration guarantees body is string
 
-        if (raw.statusCode === 200 && parsed && !parsed.error) {
+        if (raw.statusCode === 200 && parsed) {
           setAreaInfo(parsed);
           setShowAreaBox(false); // reset until submit
           console.log("Base info parsed:", parsed);
         } else {
-          console.error("Base info error:", parsed.error || "Unknown error");
+          console.error("Base info error:", parsed?.error || "Unknown error");
           setAreaInfo(null);
         }
       } catch (err) {
@@ -73,10 +73,9 @@ export default function BookingForm() {
         alert("Error: " + (result.error || "Unknown error"));
       }
 
-      if (areaInfo && !areaInfo.error) {
-        setShowAreaBox(true); // show area info box after submit
-        console.log("Showing maps for:", areaInfo);
-      }
+      // ✅ Always show area info box after submit
+      setShowAreaBox(true);
+      console.log("Showing maps for:", areaInfo);
     } catch (err) {
       console.error("Error submitting booking:", err);
       alert("Submission failed. Check console for details.");
