@@ -8,7 +8,7 @@ export default function BookingForm() {
   });
 
   const [areaInfo, setAreaInfo] = useState(null);
-  const [showMaps, setShowMaps] = useState(false);
+  const [showAreaBox, setShowAreaBox] = useState(false);
 
   const bases = [
     "RAF Brize Norton",
@@ -32,16 +32,14 @@ export default function BookingForm() {
           `https://qpt7e2jrjj.execute-api.us-east-1.amazonaws.com/dev/base-info?base=${encodeURIComponent(baseName)}`
         );
         const raw = await res.json();
+        const parsed = JSON.parse(raw.body); // proxy integration guarantees body is string
 
-        // ✅ Proxy integration guarantees raw.body is a string
-        const parsed = JSON.parse(raw.body);
-
-        if ((raw.statusCode && raw.statusCode === 200) || res.ok) {
+        if (raw.statusCode === 200 && parsed && !parsed.error) {
           setAreaInfo(parsed);
-          setShowMaps(false); // reset maps until submit
+          setShowAreaBox(false); // reset until submit
           console.log("Base info parsed:", parsed);
         } else {
-          console.error("Base info error:", parsed?.error || "Unknown error");
+          console.error("Base info error:", parsed.error || "Unknown error");
           setAreaInfo(null);
         }
       } catch (err) {
@@ -75,8 +73,8 @@ export default function BookingForm() {
         alert("Error: " + (result.error || "Unknown error"));
       }
 
-      if (formData.base && areaInfo) {
-        setShowMaps(true);
+      if (areaInfo && !areaInfo.error) {
+        setShowAreaBox(true); // show area info box after submit
         console.log("Showing maps for:", areaInfo);
       }
     } catch (err) {
@@ -114,17 +112,17 @@ export default function BookingForm() {
         <button type="button" onClick={handleSubmit}>Submit Booking</button>
       </form>
 
-      {areaInfo && showMaps && (
+      {showAreaBox && (
         <div className="area-info">
-          <h3>Area Information</h3>
-          <p><strong>Postcode:</strong> {areaInfo.postcode}</p>
-          <p><strong>Region:</strong> {areaInfo.area_info.region}</p>
-          <p><strong>District:</strong> {areaInfo.area_info.district}</p>
-          <p><strong>Country:</strong> {areaInfo.area_info.country}</p>
+          <h2>Area Information</h2>
+          <p><strong>Postcode:</strong> {areaInfo?.postcode || "N/A"}</p>
+          <p><strong>Region:</strong> {areaInfo?.area_info?.region || "N/A"}</p>
+          <p><strong>District:</strong> {areaInfo?.area_info?.district || "N/A"}</p>
+          <p><strong>Country:</strong> {areaInfo?.area_info?.country || "N/A"}</p>
 
+          <h3>Surrounding Area (5 miles)</h3>
           <div className="map-container">
-            <h3>Surrounding Area (5 miles)</h3>
-            {areaInfo.map_urls.map((url, idx) => (
+            {Array.isArray(areaInfo?.map_urls) && areaInfo.map_urls.map((url, idx) => (
               <img
                 key={idx}
                 src={url}
