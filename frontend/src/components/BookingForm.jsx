@@ -33,17 +33,8 @@ export default function BookingForm() {
         );
         const raw = await res.json();
 
-        // ✅ Safe parsing: handle both string and object body
-        let parsed;
-        if (raw.body) {
-          if (typeof raw.body === "string") {
-            parsed = JSON.parse(raw.body);
-          } else {
-            parsed = raw.body;
-          }
-        } else {
-          parsed = raw;
-        }
+        // ✅ Proxy integration guarantees raw.body is a string
+        const parsed = JSON.parse(raw.body);
 
         if ((raw.statusCode && raw.statusCode === 200) || res.ok) {
           setAreaInfo(parsed);
@@ -127,13 +118,13 @@ export default function BookingForm() {
         <div className="area-info">
           <h3>Area Information</h3>
           <p><strong>Postcode:</strong> {areaInfo.postcode}</p>
-          <p><strong>Region:</strong> {areaInfo.area_info?.region}</p>
-          <p><strong>District:</strong> {areaInfo.area_info?.district}</p>
-          <p><strong>Country:</strong> {areaInfo.area_info?.country}</p>
+          <p><strong>Region:</strong> {areaInfo.area_info.region}</p>
+          <p><strong>District:</strong> {areaInfo.area_info.district}</p>
+          <p><strong>Country:</strong> {areaInfo.area_info.country}</p>
 
           <div className="map-container">
             <h3>Surrounding Area (5 miles)</h3>
-            {Array.isArray(areaInfo.map_urls) && areaInfo.map_urls.map((url, idx) => (
+            {areaInfo.map_urls.map((url, idx) => (
               <img
                 key={idx}
                 src={url}
